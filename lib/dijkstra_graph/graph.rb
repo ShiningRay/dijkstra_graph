@@ -28,9 +28,7 @@ module DijkstraGraph
       queue = initialize_queue(start)          # Begin at start node
       until queue.empty?
         v, distances[v] = queue.delete_min     # Visit next closest vertex
-        next_neighbours(v, distances).each do |w| # Update neighbours
-          queue[w] = distances[w] = updated_distance_to_w(v, w, distances)
-        end
+        update_distances_to_neighbours(v, distances, queue) # Update neighbours
       end
       distances
     end
@@ -42,10 +40,9 @@ module DijkstraGraph
       distances = Hash.new { Float::INFINITY } # Initialize distances to Inf
       queue = initialize_queue(start)          # Initialize queue with start
       until queue.empty?
-        v, distances[v] = queue.delete_min        # Visit next closest vertex
-        next_neighbours(v, distances).each do |w| # Update neighbours
-          update_path_to_w(v, w, paths, distances, queue)
-        end
+        # Visit next closest vertex and update neighbours
+        v, distances[v] = queue.delete_min
+        update_paths_to_neighbours(v, paths, distances, queue)
       end
       paths
     end
@@ -59,33 +56,27 @@ module DijkstraGraph
       queue
     end
 
-    # Returns adjacent vertices along outgoing edges from v
-    # where known distance to neighbour > distance to v
-    def next_neighbours(v, distances)
-      distance_to_v = distances[v]
-      get_adjacent_vertices(v).select { |w| distance_to_v < distances[w] }
+    # Update distances to neighbours of v and queue changed neighbours
+    def update_distances_to_neighbours(v, distances, queue)
+      distance_v = distances[v]
+      get_adjacent_vertices(v).each do |w|
+        distance_through_v = distance_v + get_edge_weight(v, w)
+        if distance_through_v < distances[w]
+          queue[w] = distances[w] = distance_through_v
+        end
+      end
     end
 
-    # If we find a shorter path to w, update w's path
-    # and add w to the to-visit queue
-    def update_path_to_w(v, w, paths, distances, queue)
-      distance_through_v = distances[v] + get_edge_weight(v, w)
-      return if distances[w] <= distance_through_v
-      queue[w] = distances[w] = distance_through_v
-      paths[w] = v
-    end
-
-    # Returns minimum distance to w found so far
-    def updated_distance_to_w(v, w, distances)
-      min(
-        distances[w],
-        distances[v] + get_edge_weight(v, w)
-      )
-    end
-
-    # Return the minimum of two values
-    def min(a, b)
-      a < b ? a : b
+    # Update paths to neighbours of v and queue changed neighbours
+    def update_paths_to_neighbours(v, paths, distances, queue)
+      distance_v = distances[v]
+      get_adjacent_vertices(v).each do |w|
+        distance_through_v = distance_v + get_edge_weight(v, w)
+        if distance_through_v < distances[w]
+          queue[w] = distances[w] = distance_through_v
+          paths[w] = v
+        end
+      end
     end
   end
 end
