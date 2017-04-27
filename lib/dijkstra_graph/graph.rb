@@ -23,6 +23,9 @@ module DijkstraGraph
 
     # Use Dijkstra's algorithm to find the shortest distances
     # from the start vertex to each of the other vertices
+    #
+    # Returns a hash of form { 'start' => 0, 'a' => 3, 'b' => 4 },
+    # where result[v] indicates the shortest distance from start to v
     def shortest_distances(start)
       distances = Hash.new { Float::INFINITY } # Initial distances = Inf
       queue = initialize_queue(start)          # Begin at start node
@@ -35,6 +38,9 @@ module DijkstraGraph
 
     # Use Dijkstra's algorithm to find the shortest paths
     # from the start vertex to each of the other vertices
+    #
+    # Returns a hash of form { 'a' => 'start', 'b' => 'a' }, where
+    # result[v] indicates the predecessor on the shortest path to v
     def shortest_paths(start)
       paths = {}                               # Initialize paths to empty hash
       distances = Hash.new { Float::INFINITY } # Initialize distances to Inf

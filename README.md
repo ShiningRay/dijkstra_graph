@@ -4,7 +4,47 @@ dijkstra_graph is a Ruby library implementing Dijkstra's shortest path algorithm
 
 It uses a Fibonnaci heap for amortized O(1) updates of vertex distances, and an adjacency list for edges for O(1) look-up of the neighbours list for the current vertex.
 
-This library is currently under development.
+## DijkstraGraph::Graph API
+
+```ruby
+# Add directed edge (source, destination) to the graph with given weight
+# Requires that weight is a positive number
+add_edge(source, destination, weight)
+
+# Add undirected edge (vertex_a, vertex_b) to the graph with given weight
+# Requires that weight is a positive number
+add_undirected_edge(vertex_a, vertex_b, weight)
+
+# Remove directed edge (source, destination) from the graph
+remove_edge(source, destination)
+
+# Remove undirected edge (vertex_a, vertex_b) from the graph
+remove_undirected_edge(vertex_a, vertex_b)
+
+# Return true iff the graph contains directed edge (source, destination)
+contains_edge?(source, destination)
+
+# Returns the weight of directed edge (source, destination),
+# or returns Float::INFINITY if no such edge exists
+get_edge_weight(source, destination)
+
+# Returns the set of vertices v_i where edge (source, v_i) is in the graph
+get_adjacent_vertices(source)
+
+# Use Dijkstra's algorithm to find the shortest distances
+# from the start vertex to each of the other vertices
+#
+# Returns a hash of form { 'start' => 0, 'a' => 3, 'b' => 4 },
+# where result[v] indicates the shortest distance from start to v
+shortest_distances(start)
+
+# Use Dijkstra's algorithm to find the shortest paths
+# from the start vertex to each of the other vertices
+#
+# Returns a hash of form { 'a' => 'start', 'b' => 'a' }, where
+# result[v] indicates the predecessor on the shortest path to v
+shortest_paths(start)
+```
 
 ## Development
 
