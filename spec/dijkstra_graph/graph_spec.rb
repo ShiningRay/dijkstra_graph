@@ -5,6 +5,7 @@ module DijkstraGraph
   describe Graph do
     it { is_expected.to respond_to(:shortest_distances).with(1).argument }
     it { is_expected.to respond_to(:shortest_paths).with(1).argument }
+    it { is_expected.to respond_to(:shortest_path).with(2).arguments }
 
     before do
       @graph = DijkstraGraph::Graph.new
@@ -101,6 +102,57 @@ module DijkstraGraph
         expect(paths_from_start['f']).to eq('a')
         expect(paths_from_start['unconnected1']).to eq(nil)
         expect(paths_from_start['unconnected2']).to eq(nil)
+      end
+    end
+
+    describe '.shortest_path' do
+      it 'returns an empty array for empty graphs' do
+        expect(@graph.shortest_path('a', 'b')).to be_empty
+      end
+      it 'returns an empty array for non-existent vertices' do
+        @graph.add_edge('a', 'b', 3)
+        expect(@graph.shortest_path('a', 'c')).to be_empty
+        expect(@graph.shortest_path('d', 'a')).to be_empty
+        expect(@graph.shortest_path('c', 'd')).to be_empty
+      end
+      it 'returns an empty array if no path exists' do
+        @graph.add_edge('a', 'b', 3)
+        @graph.add_edge('b', 'c', 3)
+        expect(@graph.shortest_path('c', 'a')).to be_empty
+      end
+      it 'returns direct path if it is shorter' do
+        @graph.add_edge('a', 'b', 3)
+        @graph.add_edge('a', 'c', 5)
+        @graph.add_edge('b', 'c', 10)
+        path = @graph.shortest_path('a', 'c')
+        expect(path).to eq(%w[a c])
+      end
+      it 'returns indirect path if it is shorter' do
+        @graph.add_edge('a', 'b', 3)
+        @graph.add_edge('a', 'c', 50)
+        @graph.add_edge('b', 'c', 10)
+        path = @graph.shortest_path('a', 'c')
+        expect(path).to eq(%w[a b c])
+      end
+      it 'returns shortest path from start to destination' do
+        @graph.add_edge('a', 'b', 5)
+        @graph.add_edge('b', 'a', 4)
+        @graph.add_edge('b', 'c', 2)
+        @graph.add_edge('c', 'd', 8)
+        @graph.add_undirected_edge('d', 'e', 5)
+        @graph.add_edge('a', 'f', 10)
+        @graph.add_edge('f', 'e', 12)
+        @graph.add_edge('start', 'b', 3)
+        @graph.add_edge('start', 'c', 4)
+        @graph.add_edge('unconnected1', 'unconnected2', 2)
+        expect(@graph.shortest_path('start', 'a')).to eq(%w[start b a])
+        expect(@graph.shortest_path('start', 'b')).to eq(%w[start b])
+        expect(@graph.shortest_path('start', 'c')).to eq(%w[start c])
+        expect(@graph.shortest_path('start', 'd')).to eq(%w[start c d])
+        expect(@graph.shortest_path('start', 'e')).to eq(%w[start c d e])
+        expect(@graph.shortest_path('start', 'f')).to eq(%w[start b a f])
+        expect(@graph.shortest_path('start', 'unconnected1')).to eq([])
+        expect(@graph.shortest_path('start', 'unconnected2')).to eq([])
       end
     end
   end

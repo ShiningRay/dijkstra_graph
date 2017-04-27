@@ -1,6 +1,8 @@
 require 'priority_queue'
 require 'weighted_graph'
 
+require_relative '../util/path_util'
+
 # Dijstra graph library
 module DijkstraGraph
   # A graph supporting Dijkstra's shortest path algorithm
@@ -51,6 +53,23 @@ module DijkstraGraph
         update_paths_to_neighbours(v, paths, distances, queue)
       end
       paths
+    end
+
+    # Use Dijkstra's algorithm to find the shortest path
+    # from the start vertex to the destination vertex
+    #
+    # Returns an array of vertices along the shortest path
+    # of form ['a', 'b', 'c'], or [] if no such path exists
+    def shortest_path(start, dest)
+      paths = {}                               # Initialize paths to empty hash
+      distances = Hash.new { Float::INFINITY } # Initialize distances to Inf
+      queue = initialize_queue(start)          # Initialize queue with start
+      until queue.empty?
+        v, distances[v] = queue.delete_min     # Visit next closest node
+        return PathUtil.path_array(paths, start, dest) if v == dest
+        update_paths_to_neighbours(v, paths, distances, queue)
+      end
+      [] # No path found from start to dest
     end
 
     private

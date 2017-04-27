@@ -44,6 +44,13 @@ shortest_distances(start)
 # Returns a hash of form { 'a' => 'start', 'b' => 'a' }, where
 # result[v] indicates the predecessor on the shortest path to v
 shortest_paths(start)
+
+# Use Dijkstra's algorithm to find the shortest path
+# from the start vertex to the destination vertex
+#
+# Returns an array of vertices along the shortest path
+# of form ['a', 'b', 'c'], or [] if no such path exists
+shortest_path(start, destination)
 ```
 
 ## Development
