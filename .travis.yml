@@ -1,0 +1,9 @@
+sudo: false
+language: ruby
+rvm:
+  - 2.4.1
+cache: bundler
+
+before_install: gem install bundler -v 1.14.6
+before_script: bundle install
+script: bundle exec rake spec
