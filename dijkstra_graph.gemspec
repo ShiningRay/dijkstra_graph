@@ -33,7 +33,19 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
+  spec.add_dependency 'PriorityQueue', '~> 0.1'
+  spec.add_dependency 'weighted_graph', '~> 0.1'
+
   spec.add_development_dependency 'bundler', '~> 1.14'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
+
+  # Pry is a useful debugging utility, uncomment for local use.
+  #
+  # To use pry:
+  # - Uncomment the 'spec.add_development_dependency' line below
+  # - Add "require 'pry'" to the relevant Ruby source file
+  # - Add 'binding.pry' above the line you wish to break at
+  # - Run 'rake spec', and the console will break at that line
+  # spec.add_development_dependency 'pry', '~> 0.10'
 end

@@ -1,5 +1,6 @@
 Style/BlockLength:
   Exclude:
+    - 'dijkstra_graph.gemspec'
     - 'Rakefile'
     - '**/*.rake'
     - 'spec/**/*.rb'
