@@ -27,13 +27,27 @@ module DijkstraGraph
       distances = Hash.new { Float::INFINITY } # Initial distances = Inf
       queue = initialize_queue(start)          # Begin at start node
       until queue.empty?
-        v, distances[v] = queue.delete_min     # Set distance to closest vertex
+        v, distances[v] = queue.delete_min     # Visit next closest vertex
         next_neighbours(v, distances).each do |w| # Update neighbours
-          update_distance_to_w(v, w, distances)
-          queue[w] = distances[w]
+          queue[w] = distances[w] = updated_distance_to_w(v, w, distances)
         end
       end
       distances
+    end
+
+    # Use Dijkstra's algorithm to find the shortest paths
+    # from the start vertex to each of the other vertices
+    def shortest_paths(start)
+      paths = {}                               # Initialize paths to empty hash
+      distances = Hash.new { Float::INFINITY } # Initialize distances to Inf
+      queue = initialize_queue(start)          # Initialize queue with start
+      until queue.empty?
+        v, distances[v] = queue.delete_min        # Visit next closest vertex
+        next_neighbours(v, distances).each do |w| # Update neighbours
+          update_path_to_w(v, w, paths, distances, queue)
+        end
+      end
+      paths
     end
 
     private
@@ -52,9 +66,18 @@ module DijkstraGraph
       get_adjacent_vertices(v).select { |w| distance_to_v < distances[w] }
     end
 
-    # Update distance to w if path with edge (v,w) is shorter
-    def update_distance_to_w(v, w, distances)
-      distances[w] = min(
+    # If we find a shorter path to w, update w's path
+    # and add w to the to-visit queue
+    def update_path_to_w(v, w, paths, distances, queue)
+      distance_through_v = distances[v] + get_edge_weight(v, w)
+      return if distances[w] <= distance_through_v
+      queue[w] = distances[w] = distance_through_v
+      paths[w] = v
+    end
+
+    # Returns minimum distance to w found so far
+    def updated_distance_to_w(v, w, distances)
+      min(
         distances[w],
         distances[v] + get_edge_weight(v, w)
       )
