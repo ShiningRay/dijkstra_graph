@@ -50,7 +50,7 @@ module DijkstraGraph
       until queue.empty?
         # Visit next closest vertex and update neighbours
         v, distances[v] = queue.delete_min
-        update_paths_to_neighbours(v, predecessors, distances, queue)
+        update_paths_to_neighbours(v, distances, queue, predecessors)
       end
       PathUtil.path_arrays(predecessors, source)
     end
@@ -69,7 +69,7 @@ module DijkstraGraph
         v, distance = queue.delete_min
         return PathUtil.path_arrays(predecessors, source) if distance > radius
         distances[v] = distance
-        update_neighbours_in_radius(v, predecessors, distances, queue, radius)
+        update_neighbours_in_radius(v, distances, queue, predecessors, radius)
       end
       PathUtil.path_arrays(predecessors, source)
     end
@@ -86,7 +86,7 @@ module DijkstraGraph
       until queue.empty?
         v, distances[v] = queue.delete_min     # Visit next closest node
         return PathUtil.path_array(predecessors, source, dest) if v == dest
-        update_paths_to_neighbours(v, predecessors, distances, queue)
+        update_paths_to_neighbours(v, distances, queue, predecessors)
       end
       [] # No path found from source to dest
     end
@@ -102,37 +102,45 @@ module DijkstraGraph
 
     # Update distances to neighbours of v and queue changed neighbours
     def update_distances_to_neighbours(v, distances, queue)
-      distance_v = distances[v]
-      get_adjacent_vertices(v).each do |w|
-        distance_through_v = distance_v + get_edge_weight(v, w)
-        if distance_through_v < distances[w]
-          queue[w] = distances[w] = distance_through_v
-        end
-      end
+      update_neighbours(v, distances, method(:update_distance),
+                        distances: distances, queue: queue)
     end
 
     # Update paths to neighbours of v and queue changed neighbours
-    def update_paths_to_neighbours(v, predecessors, distances, queue)
+    def update_paths_to_neighbours(v, distances, queue, predecessors)
+      update_neighbours(v, distances, method(:update_path),
+                        distances: distances, queue: queue,
+                        predecessors: predecessors, predecessor: v)
+    end
+
+    # Update paths to neighbours of v in radius and queue changed neighbours
+    def update_neighbours_in_radius(v, distances, queue, predecessors, radius)
+      update_neighbours(v, distances, method(:update_path),
+                        distances: distances, queue: queue, radius: radius,
+                        predecessors: predecessors, predecessor: v)
+    end
+
+    # Apply given method to each neighbour we find a shorter path to
+    def update_neighbours(v, distances, update_method, update_params)
       distance_v = distances[v]
       get_adjacent_vertices(v).each do |w|
         distance_through_v = distance_v + get_edge_weight(v, w)
         if distance_through_v < distances[w]
-          queue[w] = distances[w] = distance_through_v
-          predecessors[w] = v
+          update_method.call(w, distance_through_v, update_params)
         end
       end
     end
 
-    # Update paths to neighbours of v in radius and queue changed neighbours
-    def update_neighbours_in_radius(v, predecessors, distances, queue, radius)
-      distance_v = distances[v]
-      get_adjacent_vertices(v).each do |w|
-        distance_through_v = distance_v + get_edge_weight(v, w)
-        if distance_through_v < distances[w] && distance_through_v <= radius
-          queue[w] = distances[w] = distance_through_v
-          predecessors[w] = v
-        end
-      end
+    # Update shortest distance to vertex
+    def update_distance(vertex, distance, params)
+      params[:queue][vertex] = params[:distances][vertex] = distance
+    end
+
+    # Update shortest path to vertex
+    def update_path(vertex, distance, params)
+      return if params[:radius] && distance > params[:radius]
+      update_distance(vertex, distance, params)
+      params[:predecessors][vertex] = params[:predecessor]
     end
   end
 end
