@@ -67,12 +67,24 @@ Then you can require the gem in Ruby programs:
 require 'dijkstra_graph'
 
 graph = DijkstraGraph::Graph.new
-graph.add_edge('Vancouver', 'Port Coquitlam', 28)
+graph.add_undirected_edge('Burnaby', 'Vancouver', 10)
+graph.add_edge('Burnaby', 'Port Coquitlam', 23)
+graph.add_edge('Vancouver', 'Langley', 37)
 graph.add_undirected_edge('Langley', 'Port Coquitlam', 35)
 shortest_paths_from_vancouver = graph.shortest_paths('Vancouver')
 
-# => { 'Port Coquitlam' => ['Vancouver', 'Port Coquitlam'],
-#      'Langley' => ['Vancouver', 'Port Coquitlam', 'Langley'] } 
+# => { 'Burnaby' => ['Vancouver', 'Burnaby'],
+#      'Langley' => ['Vancouver', 'Langley'],
+#      'Port Coquitlam' => ['Vancouver', 'Burnaby', 'Port Coquitlam'] }
+
+van_to_portco_path = graph.shortest_path('Vancouver', 'Port Coquitlam')
+
+# => ['Vancouver', 'Burnaby', 'Port Coquitlam']
+
+distances_from_vancouver = graph.shortest_distances('Vancouver')
+
+# => { 'Vancouver' => 0, 'Burnaby' => 10,
+#      'Langley' => 37, 'Port Coquitlam' => 33 }
 ```
 
 ## Development
