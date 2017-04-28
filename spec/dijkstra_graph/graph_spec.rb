@@ -118,6 +118,9 @@ module DijkstraGraph
         @graph.add_edge('b', 'c', 3)
         expect(@graph.shortest_path('c', 'a')).to be_empty
       end
+      it 'returns [v] for shortest path from v to v' do
+        expect(@graph.shortest_path('a', 'a')).to eq(['a'])
+      end
       it 'returns direct path if it is shorter' do
         @graph.add_edge('a', 'b', 3)
         @graph.add_edge('a', 'c', 5)
