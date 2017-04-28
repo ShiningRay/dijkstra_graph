@@ -32,32 +32,32 @@ get_edge_weight(source, destination)
 get_adjacent_vertices(source)
 
 # Use Dijkstra's algorithm to find the shortest distances
-# from the start vertex to each of the other vertices
+# from the source vertex to each of the other vertices
 #
-# Returns a hash of form { 'start' => 0, 'a' => 3, 'b' => 4 },
-# where result[v] indicates the shortest distance from start to v
-shortest_distances(start)
+# Returns a hash of form { 'source' => 0, 'a' => 3, 'b' => 4 },
+# where result[v] indicates the shortest distance from source to v
+shortest_distances(source)
 
 # Use Dijkstra's algorithm to find the shortest paths
-# from the start vertex to each of the other vertices
+# from the source vertex to each of the other vertices
 #
 # Returns a hash of form { 'c' => ['a', 'b', 'c'] }, where
-# result[v] indicates the shortest path from start to v
-shortest_paths(start)
+# result[v] indicates the shortest path from source to v
+shortest_paths(source)
 
 # Use Dijkstra's algorithm to find the shortest paths
-# from the start vertex to vertices within a given radius
+# from the source vertex to vertices within a given radius
 #
 # Returns a hash of form { 'c' => ['a', 'b', 'c'] }, where
-# result[v] indicates the shortest path from start to v
-shortest_paths_in_radius(start, radius)
+# result[v] indicates the shortest path from source to v
+shortest_paths_in_radius(source, radius)
 
 # Use Dijkstra's algorithm to find the shortest path
-# from the start vertex to the destination vertex
+# from the source vertex to the destination vertex
 #
 # Returns an array of vertices along the shortest path
 # of form ['a', 'b', 'c'], or [] if no such path exists
-shortest_path(start, destination)
+shortest_path(source, destination)
 ```
 
 ## Installation
