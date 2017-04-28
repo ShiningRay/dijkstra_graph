@@ -55,6 +55,25 @@ module DijkstraGraph
       PathUtil.path_arrays(predecessors, start)
     end
 
+    # Use Dijkstra's algorithm to find the shortest paths
+    # from the start vertex to vertices within a given radius
+    #
+    # Returns a hash of form { 'c' => ['a', 'b', 'c'] }, where
+    # result[v] indicates the shortest path from start to v
+    def shortest_paths_in_radius(start, radius)
+      predecessors = {}                        # Initialize vertex predecessors
+      distances = Hash.new { Float::INFINITY } # Initialize distances to Inf
+      queue = initialize_queue(start)          # Initialize queue with start
+      until queue.empty?
+        # Visit next closest vertex and update neighbours
+        v, distance = queue.delete_min
+        return PathUtil.path_arrays(predecessors, start) if distance > radius
+        distances[v] = distance
+        update_neighbours_in_radius(v, predecessors, distances, queue, radius)
+      end
+      PathUtil.path_arrays(predecessors, start)
+    end
+
     # Use Dijkstra's algorithm to find the shortest path
     # from the start vertex to the destination vertex
     #
@@ -98,6 +117,18 @@ module DijkstraGraph
       get_adjacent_vertices(v).each do |w|
         distance_through_v = distance_v + get_edge_weight(v, w)
         if distance_through_v < distances[w]
+          queue[w] = distances[w] = distance_through_v
+          predecessors[w] = v
+        end
+      end
+    end
+
+    # Update paths to neighbours of v in radius and queue changed neighbours
+    def update_neighbours_in_radius(v, predecessors, distances, queue, radius)
+      distance_v = distances[v]
+      get_adjacent_vertices(v).each do |w|
+        distance_through_v = distance_v + get_edge_weight(v, w)
+        if distance_through_v < distances[w] && distance_through_v <= radius
           queue[w] = distances[w] = distance_through_v
           predecessors[w] = v
         end

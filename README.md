@@ -45,6 +45,13 @@ shortest_distances(start)
 # result[v] indicates the shortest path from start to v
 shortest_paths(start)
 
+# Use Dijkstra's algorithm to find the shortest paths
+# from the start vertex to vertices within a given radius
+#
+# Returns a hash of form { 'c' => ['a', 'b', 'c'] }, where
+# result[v] indicates the shortest path from start to v
+shortest_paths_in_radius(start, radius)
+
 # Use Dijkstra's algorithm to find the shortest path
 # from the start vertex to the destination vertex
 #
@@ -75,6 +82,11 @@ shortest_paths_from_vancouver = graph.shortest_paths('Vancouver')
 
 # => { 'Burnaby' => ['Vancouver', 'Burnaby'],
 #      'Langley' => ['Vancouver', 'Langley'],
+#      'Port Coquitlam' => ['Vancouver', 'Burnaby', 'Port Coquitlam'] }
+
+van_paths_within_35k = graph.shortest_paths_in_radius('Vancouver', 35)
+
+# => { 'Burnaby' => ['Vancouver', 'Burnaby'],
 #      'Port Coquitlam' => ['Vancouver', 'Burnaby', 'Port Coquitlam'] }
 
 van_to_portco_path = graph.shortest_path('Vancouver', 'Port Coquitlam')

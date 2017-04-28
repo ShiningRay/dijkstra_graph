@@ -5,6 +5,7 @@ module DijkstraGraph
   describe Graph do
     it { is_expected.to respond_to(:shortest_distances).with(1).argument }
     it { is_expected.to respond_to(:shortest_paths).with(1).argument }
+    it { is_expected.to respond_to(:shortest_paths_in_radius).with(2).arguments }
     it { is_expected.to respond_to(:shortest_path).with(2).arguments }
 
     before do
@@ -100,6 +101,48 @@ module DijkstraGraph
         expect(paths_from_start['f']).to eq(%w[start b a f])
         expect(paths_from_start['unconnected1']).to eq([])
         expect(paths_from_start['unconnected2']).to eq([])
+      end
+    end
+
+    describe '.shortest_paths_in_radius' do
+      it 'returns an empty hash for empty graphs' do
+        expect(@graph.shortest_paths_in_radius('a', 5)).to be_empty
+      end
+      it 'returns an empty hash for non-existent start vertices' do
+        @graph.add_edge('a', 'b', 3)
+        expect(@graph.shortest_paths_in_radius('c', 5)).to be_empty
+      end
+      it 'returns an empty hash when no edges are in radius' do
+        @graph.add_edge('a', 'b', 3)
+        expect(@graph.shortest_paths_in_radius('c', 2)).to be_empty
+      end
+      it 'returns hash with direct path if it is shorter' do
+        @graph.add_edge('a', 'b', 3)
+        @graph.add_edge('a', 'c', 5)
+        @graph.add_edge('b', 'c', 10)
+        paths_from_a = @graph.shortest_paths_in_radius('a', 100)
+        expect(paths_from_a['b']).to eq(%w[a b])
+        expect(paths_from_a['c']).to eq(%w[a c])
+      end
+      it 'returns hash with indirect path if it is shorter' do
+        @graph.add_edge('a', 'b', 3)
+        @graph.add_edge('a', 'c', 50)
+        @graph.add_edge('b', 'c', 10)
+        paths_from_a = @graph.shortest_paths_in_radius('a', 100)
+        expect(paths_from_a['b']).to eq(%w[a b])
+        expect(paths_from_a['c']).to eq(%w[a b c])
+      end
+      it 'returns hash only containing paths in radius' do
+        @graph.add_edge('a', 'b', 3)
+        @graph.add_edge('a', 'c', 10)
+        @graph.add_edge('b', 'c', 8)
+        @graph.add_edge('a', 'd', 4)
+        @graph.add_edge('d', 'e', 4)
+        paths_from_a = @graph.shortest_paths_in_radius('a', 8)
+        expect(paths_from_a['b']).to eq(%w[a b])
+        expect(paths_from_a['d']).to eq(%w[a d])
+        expect(paths_from_a['e']).to eq(%w[a d e])
+        expect(paths_from_a['c']).to eq([])
       end
     end
 
