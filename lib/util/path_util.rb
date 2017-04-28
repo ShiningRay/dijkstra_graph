@@ -7,7 +7,7 @@ module PathUtil
     start_has_outgoing_edges = false
     predecessors.each do |v, pred|
       start_has_outgoing_edges = true if pred == start
-      paths[v] = path_array(predecessors, start, v)
+      paths[v] = path_to_vertex(paths, predecessors, start, v)
     end
     start_has_outgoing_edges ? paths : {}
   end
@@ -21,6 +21,17 @@ module PathUtil
       return path.reverse if curr_vertex == start
       curr_vertex = predecessors[curr_vertex]
       return [] if curr_vertex.nil?
+    end
+  end
+
+  # Returns path to vertex, re-using existing paths
+  # if already have the path to v's predecessor
+  def self.path_to_vertex(paths, predecessors, start, v)
+    pred = predecessors[v]
+    if paths.include?(pred)
+      paths[pred] + [v]
+    else
+      path_array(predecessors, start, v)
     end
   end
 end
