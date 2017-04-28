@@ -53,6 +53,28 @@ shortest_paths(start)
 shortest_path(start, destination)
 ```
 
+## Installation
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'dijkstra_graph'
+```
+
+Then you can require the gem in Ruby programs:
+
+```ruby
+require 'dijkstra_graph'
+
+graph = DijkstraGraph::Graph.new
+graph.add_edge('Vancouver', 'Port Coquitlam', 28)
+graph.add_undirected_edge('Langley', 'Port Coquitlam', 35)
+shortest_paths_from_vancouver = graph.shortest_paths('Vancouver')
+
+# => { 'Port Coquitlam' => ['Vancouver', 'Port Coquitlam'],
+#      'Langley' => ['Vancouver', 'Port Coquitlam', 'Langley'] } 
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
