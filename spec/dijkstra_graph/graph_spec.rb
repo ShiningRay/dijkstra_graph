@@ -12,13 +12,11 @@ module DijkstraGraph
     end
 
     describe '.shortest_distances' do
-      it 'behaves nicely for empty graphs' do
+      it 'contains zero for start node' do
         dists_from_a = @graph.shortest_distances('a')
-        # We just return a zero distance from the given
-        # start vertex to itself.
         expect(dists_from_a).to eq('a' => 0)
       end
-      it 'uses direct path if it is shorter' do
+      it 'contains distance along direct path if it is shorter' do
         @graph.add_edge('a', 'b', 3)
         @graph.add_edge('a', 'c', 5)
         @graph.add_edge('b', 'c', 10)
@@ -26,14 +24,14 @@ module DijkstraGraph
         expect(dists_from_a['b']).to eq(3)
         expect(dists_from_a['c']).to eq(5)
       end
-      it 'uses indirect path if it is shorter' do
+      it 'contains distance along indirect path if it is shorter' do
         @graph.add_edge('a', 'b', 3)
         @graph.add_edge('a', 'c', 50)
         @graph.add_edge('b', 'c', 10)
         dists_from_a = @graph.shortest_distances('a')
         expect(dists_from_a['c']).to eq(13)
       end
-      it 'finds shortest distances to all connected vertices' do
+      it 'contains shortest distances to all connected vertices' do
         @graph.add_edge('a', 'b', 5)
         @graph.add_edge('b', 'a', 4)
         @graph.add_edge('b', 'c', 2)
@@ -65,21 +63,21 @@ module DijkstraGraph
         @graph.add_edge('a', 'b', 3)
         expect(@graph.shortest_paths('c')).to be_empty
       end
-      it 'uses direct path if it is shorter' do
+      it 'returns hash with direct path if it is shorter' do
         @graph.add_edge('a', 'b', 3)
         @graph.add_edge('a', 'c', 5)
         @graph.add_edge('b', 'c', 10)
         paths_from_a = @graph.shortest_paths('a')
-        expect(paths_from_a['b']).to eq('a')
-        expect(paths_from_a['c']).to eq('a')
+        expect(paths_from_a['b']).to eq(%w[a b])
+        expect(paths_from_a['c']).to eq(%w[a c])
       end
-      it 'uses indirect path if it is shorter' do
+      it 'returns hash with indirect path if it is shorter' do
         @graph.add_edge('a', 'b', 3)
         @graph.add_edge('a', 'c', 50)
         @graph.add_edge('b', 'c', 10)
         paths_from_a = @graph.shortest_paths('a')
-        expect(paths_from_a['b']).to eq('a')
-        expect(paths_from_a['c']).to eq('b')
+        expect(paths_from_a['b']).to eq(%w[a b])
+        expect(paths_from_a['c']).to eq(%w[a b c])
       end
       it 'finds shortest paths to all connected vertices' do
         @graph.add_edge('a', 'b', 5)
@@ -93,15 +91,15 @@ module DijkstraGraph
         @graph.add_edge('start', 'c', 4)
         @graph.add_edge('unconnected1', 'unconnected2', 2)
         paths_from_start = @graph.shortest_paths('start')
-        expect(paths_from_start['start']).to eq(nil)
-        expect(paths_from_start['a']).to eq('b')
-        expect(paths_from_start['b']).to eq('start')
-        expect(paths_from_start['c']).to eq('start')
-        expect(paths_from_start['d']).to eq('c')
-        expect(paths_from_start['e']).to eq('d')
-        expect(paths_from_start['f']).to eq('a')
-        expect(paths_from_start['unconnected1']).to eq(nil)
-        expect(paths_from_start['unconnected2']).to eq(nil)
+        expect(paths_from_start['start']).to eq([])
+        expect(paths_from_start['a']).to eq(%w[start b a])
+        expect(paths_from_start['b']).to eq(%w[start b])
+        expect(paths_from_start['c']).to eq(%w[start c])
+        expect(paths_from_start['d']).to eq(%w[start c d])
+        expect(paths_from_start['e']).to eq(%w[start c d e])
+        expect(paths_from_start['f']).to eq(%w[start b a f])
+        expect(paths_from_start['unconnected1']).to eq([])
+        expect(paths_from_start['unconnected2']).to eq([])
       end
     end
 

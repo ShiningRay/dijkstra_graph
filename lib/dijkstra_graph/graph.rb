@@ -41,18 +41,18 @@ module DijkstraGraph
     # Use Dijkstra's algorithm to find the shortest paths
     # from the start vertex to each of the other vertices
     #
-    # Returns a hash of form { 'a' => 'start', 'b' => 'a' }, where
-    # result[v] indicates the predecessor on the shortest path to v
+    # Returns a hash of form { 'c' => ['a', 'b', 'c'] }, where
+    # result[v] indicates the shortest path from start to v
     def shortest_paths(start)
-      paths = {}                               # Initialize paths to empty hash
+      predecessors = {}                        # Initialize vertex predecessors
       distances = Hash.new { Float::INFINITY } # Initialize distances to Inf
       queue = initialize_queue(start)          # Initialize queue with start
       until queue.empty?
         # Visit next closest vertex and update neighbours
         v, distances[v] = queue.delete_min
-        update_paths_to_neighbours(v, paths, distances, queue)
+        update_paths_to_neighbours(v, predecessors, distances, queue)
       end
-      paths
+      PathUtil.path_arrays(predecessors, start)
     end
 
     # Use Dijkstra's algorithm to find the shortest path
@@ -61,13 +61,13 @@ module DijkstraGraph
     # Returns an array of vertices along the shortest path
     # of form ['a', 'b', 'c'], or [] if no such path exists
     def shortest_path(start, dest)
-      paths = {}                               # Initialize paths to empty hash
+      predecessors = {}                        # Initialize vertex predecessors
       distances = Hash.new { Float::INFINITY } # Initialize distances to Inf
       queue = initialize_queue(start)          # Initialize queue with start
       until queue.empty?
         v, distances[v] = queue.delete_min     # Visit next closest node
-        return PathUtil.path_array(paths, start, dest) if v == dest
-        update_paths_to_neighbours(v, paths, distances, queue)
+        return PathUtil.path_array(predecessors, start, dest) if v == dest
+        update_paths_to_neighbours(v, predecessors, distances, queue)
       end
       [] # No path found from start to dest
     end
@@ -93,13 +93,13 @@ module DijkstraGraph
     end
 
     # Update paths to neighbours of v and queue changed neighbours
-    def update_paths_to_neighbours(v, paths, distances, queue)
+    def update_paths_to_neighbours(v, predecessors, distances, queue)
       distance_v = distances[v]
       get_adjacent_vertices(v).each do |w|
         distance_through_v = distance_v + get_edge_weight(v, w)
         if distance_through_v < distances[w]
           queue[w] = distances[w] = distance_through_v
-          paths[w] = v
+          predecessors[w] = v
         end
       end
     end
