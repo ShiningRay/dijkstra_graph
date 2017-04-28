@@ -97,4 +97,4 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/msayso
 
 ## License
 
-The weighted_graph library is open source and available under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+The dijkstra_graph library is open source and available under the terms of the [MIT License](http://opensource.org/licenses/MIT).
