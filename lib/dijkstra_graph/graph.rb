@@ -1,4 +1,4 @@
-require 'priority_queue'
+require 'fc'
 require 'weighted_graph'
 
 require_relative '../util/path_util'
@@ -12,7 +12,7 @@ module DijkstraGraph
   #
   # Vertices 'to-visit' are stored in a priority queue that
   # uses a Fibonacci heap to give O(1) insert, amortized O(1)
-  # decrease_priority, and amortized O(log n) delete_min.
+  # decrease_priority, and amortized O(log n) pop.
   # Priority represents path distance from the source vertex.
   #
   # The shortest distances found so far to each vertex are
@@ -32,7 +32,7 @@ module DijkstraGraph
       distances = Hash.new { Float::INFINITY } # Initial distances = Inf
       queue = initialize_queue(source)         # Begin at source node
       until queue.empty?
-        v, distances[v] = queue.delete_min     # Visit next closest vertex
+        v, distances[v] = queue.pop     # Visit next closest vertex
         update_distances_to_neighbours(v, distances, queue) # Update neighbours
       end
       distances
@@ -49,7 +49,7 @@ module DijkstraGraph
       queue = initialize_queue(source)         # Initialize queue with source
       until queue.empty?
         # Visit next closest vertex and update neighbours
-        v, distances[v] = queue.delete_min
+        v, distances[v] = queue.pop
         update_paths_to_neighbours(v, distances, queue, predecessors)
       end
       PathUtil.path_arrays(predecessors, source)
@@ -66,7 +66,7 @@ module DijkstraGraph
       queue = initialize_queue(source)         # Initialize queue with source
       until queue.empty?
         # Visit next closest vertex and update neighbours
-        v, distance = queue.delete_min
+        v, distance = queue.pop
         return PathUtil.path_arrays(predecessors, source) if distance > radius
         distances[v] = distance
         update_neighbours_in_radius(v, distances, queue, predecessors, radius)
@@ -84,7 +84,7 @@ module DijkstraGraph
       distances = Hash.new { Float::INFINITY } # Initialize distances to Inf
       queue = initialize_queue(source)         # Initialize queue with source
       until queue.empty?
-        v, distances[v] = queue.delete_min     # Visit next closest node
+        v, distances[v] = queue.pop     # Visit next closest node
         return PathUtil.path_array(predecessors, source, dest) if v == dest
         update_paths_to_neighbours(v, distances, queue, predecessors)
       end
@@ -95,8 +95,8 @@ module DijkstraGraph
 
     # Initialize priority queue with source vertex at distance = 0
     def initialize_queue(source_vertex)
-      queue = PriorityQueue.new
-      queue[source_vertex] = 0
+      queue = FastContainers::PriorityQueue.new(:min)
+      queue.push(source_vertex, 0)
       queue
     end
 
@@ -133,7 +133,8 @@ module DijkstraGraph
 
     # Update shortest distance to vertex
     def update_distance(vertex, distance, params)
-      params[:queue][vertex] = params[:distances][vertex] = distance
+      params[:distances][vertex] = distance
+      params[:queue].push(vertex, distance) 
     end
 
     # Update shortest path to vertex
