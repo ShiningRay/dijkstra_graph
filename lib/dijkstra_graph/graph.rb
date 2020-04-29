@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'fc'
 require 'weighted_graph'
-
+require 'pry'
 require_relative '../util/path_util'
 
 # Dijstra graph library
@@ -31,8 +33,13 @@ module DijkstraGraph
     def shortest_distances(source)
       distances = Hash.new { Float::INFINITY } # Initial distances = Inf
       queue = initialize_queue(source)         # Begin at source node
+      # binding.pry
       until queue.empty?
-        v, distances[v] = queue.pop     # Visit next closest vertex
+        d = queue.top_key
+        v = queue.pop # Visit next closest vertex
+
+        distances[v] = d unless distances[v] < d
+
         update_distances_to_neighbours(v, distances, queue) # Update neighbours
       end
       distances
@@ -49,7 +56,9 @@ module DijkstraGraph
       queue = initialize_queue(source)         # Initialize queue with source
       until queue.empty?
         # Visit next closest vertex and update neighbours
-        v, distances[v] = queue.pop
+        d = queue.top_key
+        v = queue.pop
+        distances[v] = d
         update_paths_to_neighbours(v, distances, queue, predecessors)
       end
       PathUtil.path_arrays(predecessors, source)
@@ -66,8 +75,10 @@ module DijkstraGraph
       queue = initialize_queue(source)         # Initialize queue with source
       until queue.empty?
         # Visit next closest vertex and update neighbours
-        v, distance = queue.pop
+        distance = queue.top_key
+        v = queue.pop
         return PathUtil.path_arrays(predecessors, source) if distance > radius
+
         distances[v] = distance
         update_neighbours_in_radius(v, distances, queue, predecessors, radius)
       end
@@ -84,8 +95,11 @@ module DijkstraGraph
       distances = Hash.new { Float::INFINITY } # Initialize distances to Inf
       queue = initialize_queue(source)         # Initialize queue with source
       until queue.empty?
-        v, distances[v] = queue.pop     # Visit next closest node
+        d = queue.top_key
+        v = queue.pop # Visit next closest node
+        distances[v] = d
         return PathUtil.path_array(predecessors, source, dest) if v == dest
+
         update_paths_to_neighbours(v, distances, queue, predecessors)
       end
       [] # No path found from source to dest
@@ -134,12 +148,13 @@ module DijkstraGraph
     # Update shortest distance to vertex
     def update_distance(vertex, distance, params)
       params[:distances][vertex] = distance
-      params[:queue].push(vertex, distance) 
+      params[:queue].push(vertex, distance)
     end
 
     # Update shortest path to vertex
     def update_path(vertex, distance, params)
       return if params[:radius] && distance > params[:radius]
+
       update_distance(vertex, distance, params)
       params[:predecessors][vertex] = params[:predecessor]
     end
