@@ -2,7 +2,6 @@
 
 require 'fc'
 require 'weighted_graph'
-require 'pry'
 require_relative '../util/path_util'
 
 # Dijstra graph library
